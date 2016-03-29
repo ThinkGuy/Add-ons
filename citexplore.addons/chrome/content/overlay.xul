@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<!-- ************ Locale **************** -->
+<!DOCTYPE window SYSTEM "chrome://browser/locale/browser.dtd" >
+
+<!-- ************ Overlay ************ -->
+<overlay id="citeXploreOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<script type="application/x-javascript" src="chrome://citeXplore/content/citexplore.js"/>
+<script type="application/x-javascript" src="chrome://citeXplore/content/citexplorepanel.js"/>
+
+<hbox id="browser">
+  <splitter id="citeXploreSplitter" class="chromeclass-extrachrome" orient="horizontal" hidden="true"/>
+  <vbox id="citeXplorePanelBox" hidden="true" width="650">
+	<hbox>
+	  <toolbar>
+		<toolbarbutton label="Hide" oncommand="citeXplorePanel.hide()"/>
+	  </toolbar>
+	</hbox>
+	<browser id="citeXploreBrowser" name="citeXploreBrowser" type="content" flex="1" />
+  </vbox>
+</hbox>
+
+</overlay>
+
+
+
+

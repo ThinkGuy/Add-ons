@@ -1,0 +1,3 @@
+content		citeXplore		chrome/content/
+skin		citeXplore		classic/1.0		chrome/skin/
+overlay		chrome://browser/content/browser.xul		chrome://citeXplore/content/overlay.xul
