@@ -16,14 +16,14 @@ var citeXplore = {
         var doc = aEvent.originalTarget;
         var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
         
-        //è·å¾—å…³é”®å­—ã€‚
+        //»ñµÃ¹Ø¼ü×Ö¡£
         var href = doc.location.href;
         var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&tn"));
         //alert(keyWord);
         
         if (!m) return;
         
-        //çŸ¥é“ç‚¹å‡»äº†ä»€ä¹ˆ
+        //ÖªµÀµã»÷ÁËÊ²Ã´
         
         var data = doc.createElement("script");
 			data.id = "citeXplore";
@@ -41,6 +41,18 @@ var citeXplore = {
             } 
 		
 		citeXplorePanel.show();
+
+        let url = "http://localhost:8080/citexplore.web/print.jsp";
+        let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                      .createInstance(Components.interfaces.nsIXMLHttpRequest);
+        request.onload = function(aEvent) {
+          window.alert("Response Text: " + aEvent.target.responseText);
+        };
+        request.onerror = function(aEvent) {
+           window.alert("Error Status: " + aEvent.target.status);
+        };
+        request.open("GET", url, true);
+        request.send(null);
 	}
 	
 };
