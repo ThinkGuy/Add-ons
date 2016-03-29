@@ -1,0 +1,45 @@
+//点击的url、备选url、标题 
+以及当前这个点击对应的查询、结果的『全部来源』以及『更多』中所有可用的url
+
+function getUrl(i) {
+    data = document.getElementById(i);
+    //title没有处理<em>和</em>
+    var title = data.getElementsByClassName(\"t c_font\")[0].getElementsByTagName('a')[0].innerHTML;
+    var clickUrl = \"http://xueshu.baidu.com\" + data.getElementsByClassName(\"t c_font\")[0].getElementsByTagName('a')[0].getAttribute(\"href\");
+    var content = data.getElementsByClassName(\"c_abstract\")[0].innerHTML; content = content.substring(0, content.indexOf(\"<div\"));
+    
+    var optionUrl;
+    
+    //全部来源 ？数目过多
+    var allSourceUrl = new Array();
+    var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");
+    for (var i=0; i<source.length; i++) {
+        allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");
+    }
+    
+    var moreUrl;
+};
+
+function sentData() {
+  // 创建一个Socket实例
+  var socket = new WebSocket('ws://localhost:8080'); 
+
+  // 打开Socket 
+  socket.onopen = function(event) { 
+
+  // 发送一个初始化消息
+  socket.send('I am the client and I\'m listening!'); 
+
+  // 监听消息
+  socket.onmessage = function(event) { 
+    console.log('Client received a message',event); 
+  }; 
+
+  // 监听Socket的关闭
+  socket.onclose = function(event) { 
+    console.log('Client notified socket has closed',event); 
+  }; 
+
+  // 关闭Socket.... 
+  //socket.close() 
+};
