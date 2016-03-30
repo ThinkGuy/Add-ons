@@ -1,0 +1,1 @@
+"C:\Program Files\7-Zip\7z" a citexplore.addon.xpi chrome install.rdf chrome.manifest
