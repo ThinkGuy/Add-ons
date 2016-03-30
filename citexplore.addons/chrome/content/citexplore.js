@@ -16,14 +16,12 @@ var citeXplore = {
         var doc = aEvent.originalTarget;
         var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
         
-        //»ñµÃ¹Ø¼ü×Ö¡£
         var href = doc.location.href;
         var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&tn"));
         //alert(keyWord);
         
         if (!m) return;
         
-        //ÖªµÀµã»÷ÁËÊ²Ã´
         
         var data = doc.createElement("script");
             data.id = "citeXplore";
@@ -42,7 +40,6 @@ var citeXplore = {
         
         citeXplorePanel.show();
 
-        //¿Í»§¶ËÓë·þÎñÆ÷Í¨Ñ¶
         let url = "http://localhost:8080/citexplore.web/print.jsp";
         let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
                       .createInstance(Components.interfaces.nsIXMLHttpRequest);
@@ -56,7 +53,7 @@ var citeXplore = {
            window.alert("Error Status: " + aEvent.target.status);
         };
         request.open("GET", url, true);
-        request.send(null);
+        request.send("name=132");
     }
     
 };
