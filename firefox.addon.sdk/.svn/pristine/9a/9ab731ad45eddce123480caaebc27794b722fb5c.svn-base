@@ -112,7 +112,7 @@ function useXUL() {
           if (browser) {
               var splitter = aDOMWindow.document.createElement('splitter');
               var propsToSet = {
-                  id: 'CiteXplore_splitter',
+                  id: 'CiteXploresplitter',
                   //class: 'sidebar-splitter' //im just copying what mozilla does for their social sidebar splitter //i left it out, but you can leave it in to see how you can style the splitter
               }
               for (var p in propsToSet) {
@@ -121,7 +121,7 @@ function useXUL() {
               
               var sidebar = aDOMWindow.document.createElement('vbox');
               var propsToSet = {
-                  id: 'CiteXplore_sidebar',
+                  id: 'CiteXploresidebar',
                   //persist: 'width' //mozilla uses persist width here, i dont know what it does and cant see it how makes a difference so i left it out
               }
               for (var p in propsToSet) {
@@ -130,7 +130,7 @@ function useXUL() {
               
               var sidebarBrowser = aDOMWindow.document.createElement('browser');
               var propsToSet = {
-                  id: 'CiteXplore_browser',
+                  id: 'CiteXplorebrowser',
                   type: 'content',
                   context: 'contentAreaContextMenu',
                   disableglobalhistory: 'true',
@@ -160,10 +160,10 @@ function useXUL() {
               return;
           }
           //START - EDIT BELOW HERE
-          var splitter = aDOMWindow.document.querySelector('#CiteXplore_splitter');
+          var splitter = aDOMWindow.document.querySelector('#CiteXploresplitter');
       
           if (splitter) {
-              var sidebar = aDOMWindow.document.querySelector('#CiteXplore_sidebar');
+              var sidebar = aDOMWindow.document.querySelector('#CiteXploresidebar');
               splitter.parentNode.removeChild(splitter);
               sidebar.parentNode.removeChild(sidebar);
           }
