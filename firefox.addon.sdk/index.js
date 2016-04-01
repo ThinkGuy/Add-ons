@@ -110,9 +110,20 @@ function useXUL() {
           //START - EDIT BELOW HERE
           var browser = aDOMWindow.document.querySelector('#browser')
           if (browser) {
+
+              // var hbox = aDOMWindow.document.createElement('hbox');
+              // var propsToSet = {
+              //   id: 'CiteXplore_hbox',
+              // }
+              // for (var p in propsToSet) {
+              //     hbox.setAttribute(p, propsToSet[p]);
+              // }
+
               var splitter = aDOMWindow.document.createElement('splitter');
               var propsToSet = {
                   id: 'CiteXplore_splitter',
+                  // orient: 'horizontal',
+                  // hidden: 'true',
                   //class: 'sidebar-splitter' //im just copying what mozilla does for their social sidebar splitter //i left it out, but you can leave it in to see how you can style the splitter
               }
               for (var p in propsToSet) {
@@ -138,7 +149,7 @@ function useXUL() {
                   clickthrough: 'never',
                   autoscrollpopup: 'autoscroller',
                   flex: '1', //do not remove this
-                  style: 'min-width: 14em; width: 25em; max-width: 36em;', //you should change these widths to how you want
+                  style: 'min-width: 20em; width: 50em; max-width: 60em;', //you should change these widths to how you want
                   src: 'http://www.citexplore.com' //or just set this to some url like http://www.bing.com/
               }
               for (var p in propsToSet) {
