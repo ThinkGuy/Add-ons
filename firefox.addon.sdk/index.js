@@ -1,45 +1,69 @@
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
 
+// tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
+
 var button = buttons.ActionButton({
   id: "citeXplore",
   label: "citeXploreS",
   icon: {
     "16": "./logo.png"
   },
-  onClick: handleClick
+  // onClick: handleClick
 });
 
-// Show the panel when the user clicks the button.
-function handleClick(state) {
-  //connectToServer();
-   sideBar();
-}
+var {Ci, Cu} = require("chrome");  
+Cu.import('resource://gre/modules/Services.jsm');
+var window = require("sdk/window/utils").getMostRecentBrowserWindow();
 
-//Client connect to server.
-function connectToServer() {
+function listen() {
+  var citeXplore = {
     
-  var Request = require("sdk/request").Request;
-  var latestTweetRequest = Request({
-  url: "http://localhost:8080/citexplore.web/print.jsp",
-  onComplete: function (response) {
-  
-  var text = response.text;
-  console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
-  }
-  });
+    init: function() {
+      
+        window.removeEventListener("load", citeXplore.init, true);
+        
+        var appcontent = window.document.getElementById("appcontent");
+        if (appcontent) {
+            appcontent.addEventListener("DOMContentLoaded", citeXplore.onPageLoad, false);
+        }
 
-  // Be a good consumer and check for rate limiting before doing more.
-  Request({
-    url: "http://localhost:8080/citexplore.web/print.jsp",
-    onComplete: function (response) {
-      if (response.text) {
-        latestTweetRequest.get();
-      } else {
-        console.log("You have been rate limited!");
-      }
+    },
+
+    onPageLoad: function(aEvent) {
+        console.log("onPageLoad");
+        var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
+        var doc = aEvent.originalTarget;
+        var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
+        
+        var href = doc.location.href;
+        var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&tn"));
+        //alert(keyWord);
+        
+        if (!m) return;
+        
+        var data = doc.createElement("script");
+            data.id = "citeXplore";
+            data.innerHTML = "function getUrl(i){var data = document.getElementById(i);var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; alert(allSourceUrl[0]);}"
+            
+            doc.getElementsByTagName('body')[0].appendChild(data);
+            
+            var list = doc.getElementsByClassName('result sc_default_result xpath-log');
+            
+            for (var i=0; i<list.length; i++) {
+                var button = doc.createElement("span");
+                button.innerHTML ="<input type=\"button\" value=\"getData\" onclick=\"getUrl(" + (i+1) + ")\">";
+                button.id="getUrl" + (i+1);
+                list[i].appendChild(button);
+            } 
+
+         sideBar();
+         console.log('55454545454545454545');
+        // citeXplorePanel.show();
     }
-  }).get();
+  };
+
+citeXplore.init();
 }
 
 function sideBar() {
@@ -198,59 +222,33 @@ function sideBar() {
   
   function install() {}
   
-  windowListener.register();  
+windowListener.register();  
 }
 
-function listen() {
-   
-  var {Ci, Cu} = require("chrome");  
-  Cu.import('resource://gre/modules/Services.jsm');
-
-  var citeXplore = {
+//Client connect to server.
+function connectToServer() {
     
-    init: function() {
-      var window = require("sdk/window/utils").getMostRecentBrowserWindow();
-        window.removeEventListener("load", citeXplore.init, true);
-        
-        var appcontent = window.document.getElementById("appcontent");
-        if (appcontent) {
-            appcontent.addEventListener("DOMContentLoaded", citeXplore.onPageLoad, false);
-        }
+  var Request = require("sdk/request").Request;
+  var latestTweetRequest = Request({
+  url: "http://localhost:8080/citexplore.web/print.jsp",
+  onComplete: function (response) {
+  
+  var text = response.text;
+  console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+  }
+  });
 
-    },
-
-    onPageLoad: function(aEvent) {
-        console.log("onPageLoad");
-        var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
-        var doc = aEvent.originalTarget;
-        var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
-        
-        var href = doc.location.href;
-        var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&tn"));
-        //alert(keyWord);
-        
-        if (!m) return;
-        
-        
-        var data = doc.createElement("script");
-            data.id = "citeXplore";
-            data.innerHTML = "function getUrl(i){var data = document.getElementById(i);var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; alert(allSourceUrl[0]);}"
-            
-            doc.getElementsByTagName('body')[0].appendChild(data);
-            
-            var list = doc.getElementsByClassName('result sc_default_result xpath-log');
-            
-            for (var i=0; i<list.length; i++) {
-                var button = doc.createElement("span");
-                button.innerHTML ="<input type=\"button\" value=\"getData\" onclick=\"getUrl(" + (i+1) + ")\">";
-                button.id="getUrl" + (i+1);
-                list[i].appendChild(button);
-            } 
-
-         sideBar();
-        // citeXplorePanel.show();
+  // Be a good consumer and check for rate limiting before doing more.
+  Request({
+    url: "http://localhost:8080/citexplore.web/print.jsp",
+    onComplete: function (response) {
+      if (response.text) {
+        latestTweetRequest.get();
+      } else {
+        console.log("You have been rate limited!");
+      }
     }
-  };
-
-citeXplore.init();
+  }).get();
 }
+
+window.addEventListener("load", listen(), true);
