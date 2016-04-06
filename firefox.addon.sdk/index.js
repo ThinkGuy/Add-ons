@@ -1,7 +1,7 @@
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
 
-// tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
+tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
 
 var button = buttons.ActionButton({
   id: "citeXplore",
@@ -15,6 +15,7 @@ var button = buttons.ActionButton({
 var {Ci, Cu} = require("chrome");  
 Cu.import('resource://gre/modules/Services.jsm');
 var window = require("sdk/window/utils").getMostRecentBrowserWindow();
+var initialized = false;
 
 function listen() {
   var citeXplore = {
@@ -42,6 +43,7 @@ function listen() {
         
         if (!m) return;
         
+        
         var data = doc.createElement("script");
             data.id = "citeXplore";
             data.innerHTML = "function getUrl(i){var data = document.getElementById(i);var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; alert(allSourceUrl[0]);}"
@@ -58,33 +60,36 @@ function listen() {
             } 
 
          sideBar();
-         console.log('55454545454545454545');
         // citeXplorePanel.show();
     }
   };
+
 
 citeXplore.init();
 }
 
 function sideBar() {
    
-  var {Ci, Cu} = require("chrome");  
-  Cu.import('resource://gre/modules/Services.jsm');
-  
   /*start - windowlistener*/
   var windowListener = {
       //DO NOT EDIT HERE
       onOpenWindow: function (aXULWindow) {
           // Wait for the window to finish loading
-          let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
-          aDOMWindow.addEventListener("load", function () {
-              aDOMWindow.removeEventListener("load", arguments.callee, false);
-              windowListener.loadIntoWindow(aDOMWindow, aXULWindow);
-          }, false);
+        let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
+        aDOMWindow.addEventListener("load", function () {
+            aDOMWindow.removeEventListener("load", arguments.callee, false);
+            windowListener.loadIntoWindow(aDOMWindow, aXULWindow);
+        }, false);
       },
+
       onCloseWindow: function (aXULWindow) {},
       onWindowTitleChange: function (aXULWindow, aNewTitle) {},
+
       register: function () {
+        if (initialized) {
+              return;
+        }
+        initialized = true;
           // Load into any existing windows
           let XULWindows = Services.wm.getXULWindowEnumerator(null);
           while (XULWindows.hasMoreElements()) {
@@ -95,6 +100,7 @@ function sideBar() {
           // Listen to new windows
           Services.wm.addListener(windowListener);
       },
+
       unregister: function () {
           // Unload from any existing windows
           let XULWindows = Services.wm.getXULWindowEnumerator(null);
@@ -182,6 +188,7 @@ function sideBar() {
               toolbarbutton.addEventListener('command',  function (event) {
                   aDOMWindow.document.getElementById("CiteXplore_sidebar").hidden = true;
                   aDOMWindow.document.getElementById("CiteXplore_splitter").hidden = true;
+                  initialized = false;
               }, false);
               
               browser.appendChild(splitter);
@@ -220,7 +227,10 @@ function sideBar() {
       windowListener.unregister();
   }
   
-  function install() {}
+  function install() {
+    aDOMWindow.document.getElementById("CiteXplore_sidebar").hidden = false;
+    aDOMWindow.document.getElementById("CiteXplore_splitter").hidden = false;
+  }
   
 windowListener.register();  
 }
@@ -252,3 +262,9 @@ function connectToServer() {
 }
 
 window.addEventListener("load", listen(), true);
+
+// function handleClick(state) {
+//   if (!initialized) {
+//     sideBar();
+//   }
+// }
