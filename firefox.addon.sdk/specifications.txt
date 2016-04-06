@@ -61,3 +61,21 @@ tabs.on("ready", function(tab) {
 });
 
 tabs.open("http://www.mozilla.org");
+
+
+
+Add-on与content通讯
+self.port.emit()   //send
+self.port.on()     //receive
+
+
+业务逻辑：
+1.实时监控xueshu.baidu.com//
+2.顺势弹出sidebar。				3.同时注入js获取content and url中的key
+4.用户验证。request-response。   (clientConnectToserver())
+5.将获取的content传至服务器。
+6.服务器处理完之后传至sidebar display.
+
+
+实现逻辑：
+
