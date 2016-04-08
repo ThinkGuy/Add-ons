@@ -1,36 +1,27 @@
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
-var {Ci, Cu} = require("chrome");  
-Cu.import('resource://gre/modules/Services.jsm');
-var window = require("sdk/window/utils").getMostRecentBrowserWindow();
-//createSideBar initialized.
-var initialized = false;
-//createSideBar hidden.
-var hidden = true;
+
+tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
+
 var button = buttons.ActionButton({
   id: "citeXplore",
   label: "citeXploreS",
   icon: {
     "16": "./logo.png"
   },
-  onClick: handleClick
+  // onClick: handleClick
 });
 
-/**
- * ClickTheButton.
- * @param  {[type]} state [state]
- */
-function handleClick(state) {
-  showSideBar();
-}
+var {Ci, Cu} = require("chrome");  
+Cu.import('resource://gre/modules/Services.jsm');
+var window = require("sdk/window/utils").getMostRecentBrowserWindow();
+var initialized = false;
 
-tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
-
-/** citexplore */
-function citexplore() {
+function listen() {
   var citeXplore = {
     
     init: function() {
+      
         window.removeEventListener("load", citeXplore.init, true);
         
         var appcontent = window.document.getElementById("appcontent");
@@ -52,6 +43,7 @@ function citexplore() {
         
         if (!m) return;
         
+        
         var data = doc.createElement("script");
             data.id = "citeXplore";
             data.innerHTML = "function getUrl(i){var data = document.getElementById(i);var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; alert(allSourceUrl[0]);}"
@@ -67,25 +59,16 @@ function citexplore() {
                 list[i].appendChild(button);
             } 
 
-        if (initialized) {
-          if (hidden) {
-            showSideBar();
-          } 
-          return;
-        }
-        initialized = true;
-        createSideBar();
+         sideBar();
+        // citeXplorePanel.show();
     }
   };
+
 
 citeXplore.init();
 }
 
-/**
- * create a createSideBar.
- * @return {[type]} [description]
- */
-function createSideBar() {
+function sideBar() {
    
   /*start - windowlistener*/
   var windowListener = {
@@ -99,8 +82,14 @@ function createSideBar() {
         }, false);
       },
 
+      onCloseWindow: function (aXULWindow) {},
+      onWindowTitleChange: function (aXULWindow, aNewTitle) {},
+
       register: function () {
-        
+        if (initialized) {
+              return;
+        }
+        initialized = true;
           // Load into any existing windows
           let XULWindows = Services.wm.getXULWindowEnumerator(null);
           while (XULWindows.hasMoreElements()) {
@@ -108,7 +97,7 @@ function createSideBar() {
               let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
               windowListener.loadIntoWindow(aDOMWindow, aXULWindow);
           }
-          // citexplore to new windows
+          // Listen to new windows
           Services.wm.addListener(windowListener);
       },
 
@@ -137,20 +126,20 @@ function createSideBar() {
                   id: 'CiteXplore_splitter',
                   // orient: 'horizontal',
                   hidden: 'false',
-                  //class: 'createSideBar-splitter' //im just copying what mozilla does for their social createSideBar splitter //i left it out, but you can leave it in to see how you can style the splitter
+                  //class: 'sidebar-splitter' //im just copying what mozilla does for their social sidebar splitter //i left it out, but you can leave it in to see how you can style the splitter
               }
               for (var p in propsToSet) {
                   splitter.setAttribute(p, propsToSet[p]);
               }
               
-              var createSideBar = aDOMWindow.document.createElement('vbox');
+              var sidebar = aDOMWindow.document.createElement('vbox');
               var propsToSet = {
                   id: 'CiteXplore_sidebar',
                   hidden: 'false',
                   //persist: 'width' //mozilla uses persist width here, i dont know what it does and cant see it how makes a difference so i left it out
               }
               for (var p in propsToSet) {
-                  createSideBar.setAttribute(p, propsToSet[p]);
+                  sidebar.setAttribute(p, propsToSet[p]);
               }
               
               var sidebarBrowser = aDOMWindow.document.createElement('browser');
@@ -163,7 +152,7 @@ function createSideBar() {
                   clickthrough: 'never',
                   autoscrollpopup: 'autoscroller',
                   flex: '1', //do not remove this
-                  style: 'min-width: 20em; width: 45em; max-width: 60em;', //you should change these widths to how you want
+                  style: 'min-width: 20em; width: 50em; max-width: 60em;', //you should change these widths to how you want
                   src: 'http://www.citexplore.com' //or just set this to some url like http://www.bing.com/
               }
               for (var p in propsToSet) {
@@ -199,15 +188,15 @@ function createSideBar() {
               toolbarbutton.addEventListener('command',  function (event) {
                   aDOMWindow.document.getElementById("CiteXplore_sidebar").hidden = true;
                   aDOMWindow.document.getElementById("CiteXplore_splitter").hidden = true;
-                  hidden = true;
+                  initialized = false;
               }, false);
               
               browser.appendChild(splitter);
-              browser.appendChild(createSideBar);
+              browser.appendChild(sidebar);
               toolbar.appendChild(toolbarbutton);
               hbox.appendChild(toolbar);
-              createSideBar.appendChild(hbox);
-              createSideBar.appendChild(sidebarBrowser);
+              sidebar.appendChild(hbox);
+              sidebar.appendChild(sidebarBrowser);
 
           }
           //END - EDIT BELOW HERE
@@ -220,33 +209,33 @@ function createSideBar() {
           var splitter = aDOMWindow.document.querySelector('#CiteXplore_splitter');
       
           if (splitter) {
-              var createSideBar = aDOMWindow.document.querySelector('#CiteXplore_sidebar');
+              var sidebar = aDOMWindow.document.querySelector('#CiteXplore_sidebar');
               splitter.parentNode.removeChild(splitter);
-              createSideBar.parentNode.removeChild(createSideBar);
+              sidebar.parentNode.removeChild(sidebar);
           }
           //END - EDIT BELOW HERE
       }
   };
   /*end - windowlistener*/
-
-  windowListener.register();  
-}
-
-/** show the createSideBar. */
-function showSideBar() {
-  if (initialized && hidden) {
-    let XULWindows = Services.wm.getXULWindowEnumerator(null);
-    let aXULWindow = XULWindows.getNext();
-    let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
-    console.log(aDOMWindow);
-    // createSideBar();
+  
+  function startup(aData, aReason) {
+      windowListener.register();
+  }
+  
+  function shutdown(aData, aReason) {
+      if (aReason == APP_SHUTDOWN) return;
+      windowListener.unregister();
+  }
+  
+  function install() {
     aDOMWindow.document.getElementById("CiteXplore_sidebar").hidden = false;
     aDOMWindow.document.getElementById("CiteXplore_splitter").hidden = false;
-    hidden = fasle;
   }
+  
+windowListener.register();  
 }
 
-/** Client connect to server. */
+//Client connect to server.
 function connectToServer() {
     
   var Request = require("sdk/request").Request;
@@ -272,4 +261,10 @@ function connectToServer() {
   }).get();
 }
 
-window.addEventListener("load", citexplore(), true);
+window.addEventListener("load", listen(), true);
+
+// function handleClick(state) {
+//   if (!initialized) {
+//     sideBar();
+//   }
+// }
