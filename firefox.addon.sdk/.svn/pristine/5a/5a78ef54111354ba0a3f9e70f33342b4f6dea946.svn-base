@@ -41,19 +41,14 @@ function citexplore() {
     },
 
     onPageLoad: function(aEvent) {
+        console.log("onPageLoad");
         var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
         var doc = aEvent.originalTarget;
         var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
         
         var href = doc.location.href;
-
-        if (href.indexOf("&rsv_bp") < href.indexOf("&tn")) {
-          var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&rsv_bp"));
-        } else {
-          var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&tn"));
-        }
-
-console.log(keyWord);
+        var keyWord = href.substring(href.indexOf("wd=")+3, href.indexOf("&tn"));
+        //alert(keyWord);
         
         if (!m) return;
         
@@ -243,6 +238,8 @@ function showSideBar() {
     let XULWindows = Services.wm.getXULWindowEnumerator(null);
     let aXULWindow = XULWindows.getNext();
     let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
+    console.log(aDOMWindow);
+    // createSideBar();
     aDOMWindow.document.getElementById("CiteXplore_sidebar").hidden = false;
     aDOMWindow.document.getElementById("CiteXplore_splitter").hidden = false;
     hidden = fasle;
