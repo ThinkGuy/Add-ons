@@ -60,7 +60,7 @@ console.log(keyWord);
         /*start - injectCode*/
         var data = doc.createElement("script");
             data.id = "citeXplore";
-            data.innerHTML = "var data; function getUrl(i){data = document.getElementById(i);var titleData = data.getElementsByClassName(\"t c_font\")[0].getElementsByTagName('a')[0]; var titleUrl = \"http://xueshu.baidu.com\" + titleData.getAttribute(\"href\");var title = titleData.innerHTML; var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; console.log(titleUrl);}"
+            data.innerHTML = "function getUrl(i){var data = document.getElementById(i);var titleData = data.getElementsByClassName('t c_font')[0].getElementsByTagName('a')[0]; var titleUrl = 'http://xueshu.baidu.com' + titleData.getAttribute('href');var title = titleData.innerHTML;var content = data.getElementsByClassName('c_abstract')[0].innerHTML;content = content.substring(0, content.indexOf('<')); var allSourceUrl = new Array(); var source = data.getElementsByClassName('sc_allversion')[0].getElementsByClassName('v_item_span');for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + '**http://xueshu.baidu.com' + source[i].getElementsByTagName('a')[0].getAttribute('href');}; console.log(content);}"
             
         doc.getElementsByTagName('body')[0].appendChild(data);
         
@@ -68,7 +68,7 @@ console.log(keyWord);
         
         for (var i=0; i<list.length; i++) {
             var button = doc.createElement("span");
-            button.innerHTML ="<input type=\"button\" value=\"getData\" onclick=\"getUrl(" + (i+1) + ")\">";
+            button.innerHTML ="<input type='button' value='getData' onclick='getUrl(" + (i+1) + ")'>";
             button.id="getUrl" + (i+1);
             list[i].appendChild(button);
         } 
