@@ -163,7 +163,7 @@ function createSideBar() {
                   clickthrough: 'never',
                   autoscrollpopup: 'autoscroller',
                   flex: '1', //do not remove this
-                  style: 'min-width: 20em; width: 45em; max-width: 60em;', //you should change these widths to how you want
+                  style: 'min-width: 20em; width: 50em; max-width: 60em;', //you should change these widths to how you want
                   src: 'http://www.citexplore.com' //or just set this to some url like http://www.bing.com/
               }
               for (var p in propsToSet) {
