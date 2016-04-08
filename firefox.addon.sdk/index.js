@@ -56,22 +56,25 @@ function citexplore() {
 console.log(keyWord);
         
         if (!m) return;
-        
+
+        /*start - injectCode*/
         var data = doc.createElement("script");
             data.id = "citeXplore";
-            data.innerHTML = "function getUrl(i){var data = document.getElementById(i);var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; alert(allSourceUrl[0]);}"
+            data.innerHTML = "var data; function getUrl(i){data = document.getElementById(i);var titleData = data.getElementsByClassName(\"t c_font\")[0].getElementsByTagName('a')[0]; var titleUrl = \"http://xueshu.baidu.com\" + titleData.getAttribute(\"href\");var title = titleData.innerHTML; var allSourceUrl = new Array(); var source = data.getElementsByClassName(\"sc_allversion\")[0].getElementsByClassName(\"v_item_span\");for (var i=0; i<source.length; i++) {allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + \"**http://xueshu.baidu.com\" + source[i].getElementsByTagName('a')[0].getAttribute(\"href\");}; console.log(titleUrl);}"
             
-            doc.getElementsByTagName('body')[0].appendChild(data);
-            
-            var list = doc.getElementsByClassName('result sc_default_result xpath-log');
-            
-            for (var i=0; i<list.length; i++) {
-                var button = doc.createElement("span");
-                button.innerHTML ="<input type=\"button\" value=\"getData\" onclick=\"getUrl(" + (i+1) + ")\">";
-                button.id="getUrl" + (i+1);
-                list[i].appendChild(button);
-            } 
+        doc.getElementsByTagName('body')[0].appendChild(data);
+        
+        var list = doc.getElementsByClassName('result sc_default_result xpath-log');
+        
+        for (var i=0; i<list.length; i++) {
+            var button = doc.createElement("span");
+            button.innerHTML ="<input type=\"button\" value=\"getData\" onclick=\"getUrl(" + (i+1) + ")\">";
+            button.id="getUrl" + (i+1);
+            list[i].appendChild(button);
+        } 
+        /*end - injectCode*/
 
+        /*start - createSidebar*/
         if (initialized) {
           if (hidden) {
             showSideBar();
@@ -80,6 +83,7 @@ console.log(keyWord);
         }
         initialized = true;
         createSideBar();
+        /*end - createSideBar*/
     }
   };
 
