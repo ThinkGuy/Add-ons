@@ -32,70 +32,133 @@ function handleClick(state) {
 }
 
 // for test
-//tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
+tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
 
 function citexplore() {
-    var citeXplore = {
-        init: function() {
-            window.removeEventListener("load", citeXplore.init, true);
+    var href;
+    var pageMods = require("sdk/page-mod");
+    var self = require("sdk/self");
+  
+    var pageMod = pageMods.PageMod({
+      include: ['*.baidu.com'],
+      contentScriptFile: self.data.url("content-script.js"),
+      contentScriptWhen: "ready",
+      onAttach: startListening
+    });
+    
+    function startListening(worker) {
+      var as;
+      worker.port.on('click', function(data) {
+          var queryUrl = data[0];
+          var title = data[1];
+          var titleUrl = data[2];
+          var urls = data[3];
+      
+          // worker.port.emit('warning', 'Do not click this again');
+          console.log(urls);
+      });
 
-            var appcontent = window.document.getElementById("appcontent");
-            if (appcontent) {
-                appcontent.addEventListener("DOMContentLoaded", citeXplore.onPageLoad, false);
+      worker.port.on('load', function(data) {
+          as = data;
+      });
+      href = as;
+    }
+
+    console.log("99999999999999999999999999999999999");
+    console.log(href);  
+    // window.removeEventListener("load", citexplore(), true);
+    var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
+
+    var m = (new RegExp(urls_reg, 'i')).test(href);
+
+    if (!m) return;
+
+    /*start - createSidebar*/
+        if (initialized) {
+            if (hidden) {
+                showSideBar();
             }
-
-        },
-
-        onPageLoad: function(aEvent) {
-            var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
-            var doc = aEvent.originalTarget;
-            var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
-
-            var href = doc.location.href;
-
-            if (href.indexOf("&rsv_bp") < href.indexOf("&tn")) {
-                var keyWord = href.substring(href.indexOf("wd=") + 3, href.indexOf("&rsv_bp"));
-            } else {
-                var keyWord = href.substring(href.indexOf("wd=") + 3, href.indexOf("&tn"));
-            }
-
-            console.log(keyWord);
-
-            if (!m) return;
-
-            /*start - injectCode*/
-            var pageMods = require("sdk/page-mod");
-            var self = require("sdk/self");
-          
-            var pageMod = pageMods.PageMod({
-              include: ['*.baidu.com'],
-              contentScriptFile: self.data.url("content-script.js"),
-              contentScriptWhen: "ready",
-              onAttach: startListening
-            });
-            
-            function startListening(worker) {
-              worker.port.on('click', function(data) {
-                  connectToServer(data);
-                  // console.log(urls);
-              });
-            }
-            /*end - injectCode*/
-
-            /*start - createSidebar*/
-            if (initialized) {
-                if (hidden) {
-                    showSideBar();
-                }
-                return;
-            }
-            createSideBar();
-            initialized = true;
-            /*end - createSideBar*/
+            return;
         }
-    };
+        createSideBar();
+        initialized = true;
+        /*end - createSideBar*/
+    
+    //
+    // var citeXplore = {
+    //     init: function() {
+    //         window.removeEventListener("load", citeXplore.init, true);
 
-    citeXplore.init();
+    //         var appcontent = window.document.getElementById("appcontent");
+    //         if (appcontent) {
+    //             appcontent.addEventListener("DOMContentLoaded", citeXplore.onPageLoad, false);
+    //         }
+
+    //     },
+
+    //     onPageLoad: function(aEvent) {
+    //         var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
+    //         var doc = aEvent.originalTarget;
+    //         var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
+
+    //         var href = doc.location.href;
+
+    //         if (href.indexOf("&rsv_bp") < href.indexOf("&tn")) {
+    //             var keyWord = href.substring(href.indexOf("wd=") + 3, href.indexOf("&rsv_bp"));
+    //         } else {
+    //             var keyWord = href.substring(href.indexOf("wd=") + 3, href.indexOf("&tn"));
+    //         }
+
+    //         console.log(keyWord);
+
+    //         if (!m) return;
+
+    //         /*start - injectCode*/
+    //         var data = doc.createElement("script");
+    //         data.id = "citeXplore";
+    //         data.innerHTML = "function getUrl(i) {" +
+    //             "var data = document.getElementById(i);" +
+    //             "var titleData = data.getElementsByClassName('t c_font')[0].getElementsByTagName('a')[0];" +
+    //             "var titleUrl = 'http://xueshu.baidu.com' + titleData.getAttribute('href');" +
+    //             "var title = titleData.innerHTML;var content = data.getElementsByClassName('c_abstract')[0].innerHTML;" +
+    //             "content = content.substring(0, content.indexOf('<'));" +
+    //             "var allSourceUrl = new Array();" +
+    //             "var source = data.getElementsByClassName('sc_allversion')[0].getElementsByClassName('v_item_span');" +
+    //             "for (var i=0; i<source.length; i++) {" +
+    //             "allSourceUrl[i] = source[i].getElementsByTagName('a')[0].innerHTML + '**http://xueshu.baidu.com' + source[i].getElementsByTagName('a')[0].getAttribute('href');" +
+    //             "}; " +
+    //             "console.log(title);" +
+    //             "console.log(titleUrl);" +
+    //             "console.log(content); " +
+    //             "console.log(allSourceUrl[0]);" +
+    //             "}";
+
+    //         doc.getElementsByTagName('body')[0].appendChild(data);
+
+    //         var list = doc.getElementsByClassName('result sc_default_result xpath-log');
+
+    //         for (var i = 0; i < list.length; i++) {
+    //             var button = doc.createElement("span");
+    //             button.innerHTML = "<input type='button' value='getData' onclick='getUrl(" + (i + 1) + ")'>";
+    //             button.id = "getUrl" + (i + 1);
+    //             list[i].appendChild(button);
+    //         }
+    //         /*end - injectCode*/
+
+    //         /*start - createSidebar*/
+    //         if (initialized) {
+    //             if (hidden) {
+    //                 showSideBar();
+    //             }
+    //             return;
+    //         }
+    //         createSideBar();
+    //         initialized = true;
+    //         /*end - createSideBar*/
+    //     }
+    // };
+
+    // citeXplore.init();
 }
 
 // Create side bar.
@@ -246,13 +309,8 @@ function showSideBar() {
 
 /** Client connect to server. */
 
-function connectToServer(data) {
+function connectToServer() {
 
-    var queryUrl = data[0];
-    var title = data[1];
-    var titleUrl = data[2];
-    var urls = data[3];
-    console.log(title);
     var Request = require("sdk/request").Request;
     var latestTweetRequest = Request({
         url: "http://localhost:8080/citexplore.web/print.jsp",
