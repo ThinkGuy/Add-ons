@@ -26,6 +26,24 @@ var button = actionButton.ActionButton({
 });
 
 
+        /*start - injectCode*/
+        var pageMods = require("sdk/page-mod");
+        var self = require("sdk/self");
+      
+        var pageMod = pageMods.PageMod({
+          include: ['*.baidu.com'],
+          contentScriptFile: self.data.url("content-script.js"),
+          contentScriptWhen: "ready",
+          onAttach: startListening
+        });
+        
+        function startListening(worker) {
+          worker.port.on('click', function(data) {
+              connectToServer(data);
+          });
+        }
+        /*end - injectCode*/
+
 // Toolbar button click event handler.
 function handleClick(state) {
     showSideBar();
@@ -50,24 +68,6 @@ function citexplore() {
             var doc = aEvent.originalTarget;
             var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
             if (!m) return;
-
-            /*start - injectCode*/
-            var pageMods = require("sdk/page-mod");
-            var self = require("sdk/self");
-          
-            var pageMod = pageMods.PageMod({
-              include: ['*.baidu.com'],
-              contentScriptFile: self.data.url("content-script.js"),
-              contentScriptWhen: "ready",
-              onAttach: startListening
-            });
-            
-            function startListening(worker) {
-              worker.port.on('click', function(data) {
-                  connectToServer(data);
-              });
-            }
-            /*end - injectCode*/
 
             /*start - createSidebar*/
             if (initialized) {
@@ -234,40 +234,35 @@ function showSideBar() {
 /** Client connect to server. */
 
 function connectToServer(data) {
-    var query = data[0];
+    //var query = data[0];
     var queryUrl = data[1];
     var title = data[2];
     var titleUrl = data[3];
     var urls = data[4];
 
-    console.log(query);
-    console.log(queryUrl);
-    console.log(title);
-    console.log(titleUrl);
-    console.log(urls);
-
-
-    // var Request = require("sdk/request").Request;
-    // var latestTweetRequest = Request({
-    //     url: "http://localhost:8080/citexplore.web/print.jsp",
-    //     onComplete: function(response) {
-
-    //         var text = response.text;
-    //         console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
-    //     }
-    // });
-
-    // // Be a good consumer and check for rate limiting before doing more.
-    // Request({
-    //     url: "http://localhost:8080/citexplore.web/print.jsp",
-    //     onComplete: function(response) {
-    //         if (response.text) {
-    //             latestTweetRequest.get();
-    //         } else {
-    //             console.log("You have been rate limited!");
-    //         }
-    //     }
-    // }).get();
+    var Request = require("sdk/request").Request;
+    var latestTweetRequest = Request({
+       url: "http://localhost:8080/citexplore.web/print.jsp",
+       content: {
+         title : data[2]
+       },
+       onComplete: function(response) {
+           var text = response.text;
+           console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+       }
+    });
+    
+    // Be a good consumer and check for rate limiting before doing more.
+    Request({
+       url: "http://localhost:8080/citexplore.web/print.jsp",
+       onComplete: function(response) {
+           if (response.text) {
+               latestTweetRequest.get();
+           } else {
+               console.log("You have been rate limited!");
+           }
+       }
+    }).post();
 }
 
 window.addEventListener("load", citexplore(), true);
