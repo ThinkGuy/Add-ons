@@ -1,5 +1,3 @@
-self.port.emit('load', window.location.href);
-
 if (document.getElementsByClassName("t c_font")[0] != null) {
     var tCFonts = document.getElementsByClassName("t c_font");
    

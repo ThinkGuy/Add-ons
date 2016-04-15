@@ -32,7 +32,7 @@ function handleClick(state) {
 }
 
 // for test
-//tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
+tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
 
 function citexplore() {
     var citeXplore = {
@@ -43,24 +43,12 @@ function citexplore() {
             if (appcontent) {
                 appcontent.addEventListener("DOMContentLoaded", citeXplore.onPageLoad, false);
             }
-
         },
 
         onPageLoad: function(aEvent) {
             var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
             var doc = aEvent.originalTarget;
             var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
-
-            var href = doc.location.href;
-
-            if (href.indexOf("&rsv_bp") < href.indexOf("&tn")) {
-                var keyWord = href.substring(href.indexOf("wd=") + 3, href.indexOf("&rsv_bp"));
-            } else {
-                var keyWord = href.substring(href.indexOf("wd=") + 3, href.indexOf("&tn"));
-            }
-
-            console.log(keyWord);
-
             if (!m) return;
 
             /*start - injectCode*/
@@ -77,7 +65,6 @@ function citexplore() {
             function startListening(worker) {
               worker.port.on('click', function(data) {
                   connectToServer(data);
-                  // console.log(urls);
               });
             }
             /*end - injectCode*/
@@ -247,12 +234,26 @@ function showSideBar() {
 /** Client connect to server. */
 
 function connectToServer(data) {
-
+    var query;
     var queryUrl = data[0];
     var title = data[1];
     var titleUrl = data[2];
     var urls = data[3];
-    console.log(title);
+
+    title = title.replace(new RegExp("<em>","gm"),"").replace(new RegExp("<\/em>","gm"),"");
+    
+    if (queryUrl.indexOf("&rsv_bp") < queryUrl.indexOf("&tn")) {
+        query = queryUrl.substring(queryUrl.indexOf("wd=") + 3, queryUrl.indexOf("&rsv_bp"));
+    } else {
+        query = queryUrl.substring(queryUrl.indexOf("wd=") + 3, queryUrl.indexOf("&tn"));
+    }
+
+    for (var i=0; i<urls.length; i++) {
+        if (urls[i].indexOf("http:") < 0) {
+            urls[i] = "http://xueshu.baidu.com" + urls[i];
+        }
+    }
+
     var Request = require("sdk/request").Request;
     var latestTweetRequest = Request({
         url: "http://localhost:8080/citexplore.web/print.jsp",
