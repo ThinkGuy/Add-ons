@@ -25,24 +25,23 @@ var button = actionButton.ActionButton({
     onClick: handleClick
 });
 
+/*start - injectCode*/
+var pageMods = require("sdk/page-mod");
+var self = require("sdk/self");
 
-        /*start - injectCode*/
-        var pageMods = require("sdk/page-mod");
-        var self = require("sdk/self");
-      
-        var pageMod = pageMods.PageMod({
-          include: ['*.baidu.com'],
-          contentScriptFile: self.data.url("content-script.js"),
-          contentScriptWhen: "ready",
-          onAttach: startListening
-        });
-        
-        function startListening(worker) {
-          worker.port.on('click', function(data) {
-              connectToServer(data);
-          });
-        }
-        /*end - injectCode*/
+var pageMod = pageMods.PageMod({
+  include: ['*.baidu.com'],
+  contentScriptFile: self.data.url("content-script.js"),
+  contentScriptWhen: "ready",
+  onAttach: startListening
+});
+
+function startListening(worker) {
+  worker.port.on('click', function(data) {
+      connectToServer(data);
+  });
+}
+/*end - injectCode*/
 
 // Toolbar button click event handler.
 function handleClick(state) {
@@ -232,7 +231,6 @@ function showSideBar() {
 }
 
 /** Client connect to server. */
-
 function connectToServer(data) {
     var Request = require("sdk/request").Request;
     var latestTweetRequest = Request({
