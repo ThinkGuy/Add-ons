@@ -234,6 +234,12 @@ function showSideBar() {
 /** Client connect to server. */
 
 function connectToServer(data) {
+    //var query = data[0];
+    //var queryUrl = data[1];
+    //var title = data[2];
+    //var titleUrl = data[3];
+    //var urls = data[4];
+
     var Request = require("sdk/request").Request;
     var latestTweetRequest = Request({
        url: "http://localhost:8080/citexplore.web/print.jsp",
