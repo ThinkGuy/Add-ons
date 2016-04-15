@@ -235,16 +235,20 @@ function showSideBar() {
 
 function connectToServer(data) {
     //var query = data[0];
-    var queryUrl = data[1];
-    var title = data[2];
-    var titleUrl = data[3];
-    var urls = data[4];
+    //var queryUrl = data[1];
+    //var title = data[2];
+    //var titleUrl = data[3];
+    //var urls = data[4];
 
     var Request = require("sdk/request").Request;
     var latestTweetRequest = Request({
        url: "http://localhost:8080/citexplore.web/print.jsp",
        content: {
-         title : data[2]
+            query : data[0],
+            queryUrl : data[1],
+            title : data[2],
+            titleUrl : data[3],
+            urls : data[4],
        },
        onComplete: function(response) {
            var text = response.text;
@@ -257,7 +261,7 @@ function connectToServer(data) {
        url: "http://localhost:8080/citexplore.web/print.jsp",
        onComplete: function(response) {
            if (response.text) {
-               latestTweetRequest.get();
+               latestTweetRequest.post();
            } else {
                console.log("You have been rate limited!");
            }
