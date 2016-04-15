@@ -234,40 +234,47 @@ function showSideBar() {
 /** Client connect to server. */
 
 function connectToServer(data) {
-    var query = data[0];
-    var queryUrl = data[1];
-    var title = data[2];
-    var titleUrl = data[3];
-    var urls = data[4];
+    var query;
+    var queryUrl = data[0];
+    var title = data[1];
+    var titleUrl = data[2];
+    var urls = data[3];
 
-    console.log(query);
-    console.log(queryUrl);
-    console.log(title);
-    console.log(titleUrl);
-    console.log(urls);
+    title = title.replace(new RegExp("<em>","gm"),"").replace(new RegExp("<\/em>","gm"),"");
+    
+    if (queryUrl.indexOf("&rsv_bp") < queryUrl.indexOf("&tn")) {
+        query = queryUrl.substring(queryUrl.indexOf("wd=") + 3, queryUrl.indexOf("&rsv_bp"));
+    } else {
+        query = queryUrl.substring(queryUrl.indexOf("wd=") + 3, queryUrl.indexOf("&tn"));
+    }
 
+    for (var i=0; i<urls.length; i++) {
+        if (urls[i].indexOf("http:") < 0) {
+            urls[i] = "http://xueshu.baidu.com" + urls[i];
+        }
+    }
 
-    // var Request = require("sdk/request").Request;
-    // var latestTweetRequest = Request({
-    //     url: "http://localhost:8080/citexplore.web/print.jsp",
-    //     onComplete: function(response) {
+    var Request = require("sdk/request").Request;
+    var latestTweetRequest = Request({
+        url: "http://localhost:8080/citexplore.web/print.jsp",
+        onComplete: function(response) {
 
-    //         var text = response.text;
-    //         console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
-    //     }
-    // });
+            var text = response.text;
+            console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+        }
+    });
 
-    // // Be a good consumer and check for rate limiting before doing more.
-    // Request({
-    //     url: "http://localhost:8080/citexplore.web/print.jsp",
-    //     onComplete: function(response) {
-    //         if (response.text) {
-    //             latestTweetRequest.get();
-    //         } else {
-    //             console.log("You have been rate limited!");
-    //         }
-    //     }
-    // }).get();
+    // Be a good consumer and check for rate limiting before doing more.
+    Request({
+        url: "http://localhost:8080/citexplore.web/print.jsp",
+        onComplete: function(response) {
+            if (response.text) {
+                latestTweetRequest.get();
+            } else {
+                console.log("You have been rate limited!");
+            }
+        }
+    }).get();
 }
 
 window.addEventListener("load", citexplore(), true);
