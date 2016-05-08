@@ -37,6 +37,13 @@ var pageMod = pageMods.PageMod({
   onAttach: startListening
 });
 
+/* text_entry*/
+var data = require("sdk/self").data;
+var text_entry = require("sdk/panel").Panel({
+  contentURL: data.url("text-entry.html"),
+  contentScriptFile: data.url("get-text.js")
+});
+
 function startListening(worker) {
   worker.port.on('click', function(data) {
       connectToServer("click", data);
@@ -49,8 +56,23 @@ function startListening(worker) {
 
 // Toolbar button click event handler.
 function handleClick(state) {
-    showSideBar();
+    // showSideBar();
+    text_entry.show();
 }
+
+// When the panel is displayed it generated an event called
+// "show": we will listen for that event and when it happens,
+// send our own "show" event to the panel's script, so the
+// script can prepare the panel for display.
+text_entry.on("show", function() {
+  text_entry.port.emit("show");
+});
+
+text_entry.port.on("text-entered", function (data) {
+  // console.log(text);
+  connectToServer("login", data);
+  // text_entry.hide();
+});
 
 // for test
 tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
@@ -253,7 +275,7 @@ function connectToServer(way, data) {
                 console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
             }
         });
-    } else {
+    } else if (way == "click") {
         var latestTweetRequest = Request({
             url: "http://localhost:8080/citexplore.web/print.jsp",
             content: {
@@ -267,7 +289,15 @@ function connectToServer(way, data) {
                  console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
             }
         });
-    } 
+    } else {
+        name = data[0];
+        password = data[1];
+
+        //if login success then text_entry hide.
+        if (true) {
+            text_entry.hide();
+        }
+    }
     
     // Be a good consumer and check for rate limiting before doing more.
     Request({
