@@ -1,0 +1,17 @@
+<html>
+<head>
+    <style type="text/css" media="all">
+      textarea {
+        margin: 10px;
+      }
+      body {
+        background-color: gray;
+      }
+    </style>
+  </head>
+<body>
+    name:<input type="text" id=name></input> <br>
+    password:<input type="text" id=password></input> <br>
+    <!--<textarea rows="13" cols="33" id="edit-box"></textarea>-->
+  </body>
+</html>
