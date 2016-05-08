@@ -14,6 +14,7 @@ var window = require("sdk/window/utils").getMostRecentBrowserWindow();
 // Status variables.
 var initialized = false;
 var hidden = true;
+var preQueryText = null;
 
 // Toolbar button.
 var button = actionButton.ActionButton({
@@ -38,7 +39,10 @@ var pageMod = pageMods.PageMod({
 
 function startListening(worker) {
   worker.port.on('click', function(data) {
-      connectToServer(data);
+      connectToServer("click", data);
+  });
+  worker.port.on('detach', function(data) {
+    connectToServer("detach", data);
   });
 }
 /*end - injectCode*/
@@ -231,22 +235,39 @@ function showSideBar() {
 }
 
 /** Client connect to server. */
-function connectToServer(data) {
+function connectToServer(way, data) {
     var Request = require("sdk/request").Request;
-    var latestTweetRequest = Request({
-       url: "http://localhost:8080/citexplore.web/print.jsp",
-       content: {
-            query : data[0],
-            queryUrl : data[1],
-            title : data[2],
-            titleUrl : data[3],
-            urls : data[4],
-       },
-       onComplete: function(response) {
-           var text = response.text;
-           console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
-       }
-    });
+    console.log(data);
+
+    if (way == "detach") {
+        var latestTweetRequest = Request({
+            url: "http://localhost:8080/citexplore.web/print.jsp",
+            content: {
+                preQueryText : preQueryText,
+                queryText : data[0],
+                url : data[1],
+                queryRiden : data[2],
+            },
+            onComplete: function(response) {
+                var text = response.text;
+                console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+            }
+        });
+    } else {
+        var latestTweetRequest = Request({
+            url: "http://localhost:8080/citexplore.web/print.jsp",
+            content: {
+                queryText : data[0],
+                queryUrl : data[1],
+                title : data[2],
+                urls : data[3],
+            },
+            onComplete: function(response) {
+                 var text = response.text;
+                 console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+            }
+        });
+    } 
     
     // Be a good consumer and check for rate limiting before doing more.
     Request({
@@ -259,6 +280,8 @@ function connectToServer(data) {
            }
        }
     }).post();
+
+    preQueryText = data[0];
 }
 
 window.addEventListener("load", citexplore(), true);
