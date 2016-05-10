@@ -280,7 +280,7 @@ function connectToServer(way, data) {
                 preQueryText: preQueryText,
                 queryText: data[0],
                 url: data[1],
-                queryRiden: data[2],
+                queryRider: data[2],
             },
             onComplete: function(response) {
                 var text = response.text;
