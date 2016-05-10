@@ -1,7 +1,6 @@
 /**
  * @author Liu,xinwei;
  */
-
 // System variables
 var actionButton = require('sdk/ui/button/action');
 var {
@@ -341,3 +340,4 @@ function log(level, content) {
 }
 
 window.addEventListener("load", citexplore(), true);
+
