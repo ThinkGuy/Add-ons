@@ -29,33 +29,38 @@ var button = actionButton.ActionButton({
 
 // Toolbar button click event handler.
 function handleClick(state) {
+    panel.show({
+      position: button
+    });
     // showSideBar();
-    text_entry.show();
+    // text_entry.show();
 }
 
 /* text_entry */
-// TODO panel position
+var { ToggleButton } = require('sdk/ui/button/toggle');
+var panels = require("sdk/panel");
 var data = require("sdk/self").data;
-var text_entry = require("sdk/panel").Panel({
-    contentURL: data.url("text-entry.html"),
-    contentScriptFile: data.url("get-text.js")
+
+var panel = panels.Panel({
+  contentURL: data.url("panel.html"),
+  contentScriptFile: data.url("get-text.js"),
+  onHide: handleHide
 });
 
-// When the panel is displayed it generated an event called
-// "show": we will listen for that event and when it happens,
-// send our own "show" event to the panel's script, so the
-// script can prepare the panel for display.
-text_entry.on("show", function() {
-    text_entry.port.emit("show");
+function handleHide() {
+  button.state('window', {checked: false});
+}
+
+panel.on("show", function() {
+    panel.port.emit("show");
 });
 
-text_entry.port.on("text-entered", function(data) {
+panel.port.on("text-entered", function(data) {
+    log(1, data);
     // console.log(data);
     connectToServer("login", data);
-    text_entry.hide();
+    // panel.hide();
 });
-
-/*  end login panel - needs revision */
 
 /* start - injectCode */
 
@@ -265,7 +270,7 @@ function showSideBar() {
 
 function connectToServer(way, data) {
     var Request = require("sdk/request").Request;
-    console.log(data);
+    log(1, data);
 
     // TODO send only when logged in
     if (way == "detach") {
@@ -280,7 +285,7 @@ function connectToServer(way, data) {
             onComplete: function(response) {
                 var text = response.text;
                 // TODO revise log information with log level
-                console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+log(1, text);      
             }
         });
     } else if (way == "click") {
@@ -294,7 +299,7 @@ function connectToServer(way, data) {
             },
             onComplete: function(response) {
                 var text = response.text;
-                console.log("text: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + text);
+                log(1, text);  
             }
         });
     } else {
@@ -303,7 +308,7 @@ function connectToServer(way, data) {
 
         //if login success then text_entry hide.
         if (true) {
-            text_entry.hide();
+            panel.hide();
         }
     }
 
@@ -320,6 +325,19 @@ function connectToServer(way, data) {
     }).post();
 
     preQueryText = data[0];
+}
+
+function log(level, content) {
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth()+1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    var time = year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
+
+    console.log("log:" + time + " level:" + level + " " + content);
 }
 
 window.addEventListener("load", citexplore(), true);
