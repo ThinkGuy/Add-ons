@@ -1,4 +1,8 @@
 /* end - injectCode */
+var {
+    Ci, Cu
+} = require("chrome");
+Cu.import('resource://gre/modules/Services.jsm');
 var window = require("sdk/window/utils").getMostRecentBrowserWindow();
 var initialized = false;
 

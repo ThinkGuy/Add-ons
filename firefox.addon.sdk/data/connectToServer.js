@@ -4,8 +4,8 @@ var preQueryText = null;
 
 function connectToServer(way, data) {
     var Request = require("sdk/request").Request;
-    logInfo.log(1, data);
-    console.log("***********" + data[2][date]);
+logInfo.log(1, data);
+logInfo.log(1, data[2]);
 
     // TODO send only when logged in
     if (way == "detach") {
