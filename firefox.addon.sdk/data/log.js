@@ -10,3 +10,5 @@ function log(level, content) {
 
     console.log("log:" + time + " level:" + level + " " + content);
 }
+
+exports.log = log;

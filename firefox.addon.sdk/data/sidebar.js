@@ -1,90 +1,6 @@
-/**
- * @author Liu,xinwei;
- */
-// System variables
-var actionButton = require('sdk/ui/button/action');
-var {
-    Ci, Cu
-} = require("chrome");
-Cu.import('resource://gre/modules/Services.jsm');
-var window = require("sdk/window/utils").getMostRecentBrowserWindow();
-
-// Status variables.
-var connect = require("./data/connectToServer");
-var logInfo = require('./data/log');
-
-var initialized = false;
-var hidden = true;
-
-/* login panel - needs revision */
-
-// Toolbar button.
-var button = actionButton.ActionButton({
-    id: "citeXplore_button",
-    label: "citeXplore",
-    icon: {
-        "16": "./logo.png"
-    },
-    onClick: handleClick
-});
-
-// Toolbar button click event handler.
-function handleClick(state) {
-    panel.show({
-      position: button
-    });
-    // showSideBar();
-    // text_entry.show();
-}
-
-/* text_entry */
-var { ToggleButton } = require('sdk/ui/button/toggle');
-var panels = require("sdk/panel");
-var data = require("sdk/self").data;
-
-var panel = panels.Panel({
-  contentURL: data.url("panel.html"),
-  contentScriptFile: data.url("get-text.js"),
-  onHide: handleHide
-});
-
-function handleHide() {
-  button.state('window', {checked: false});
-}
-
-panel.on("show", function() {
-    panel.port.emit("show");
-});
-
-panel.port.on("text-entered", function(data) {
-    logInfo.log(1, data);
-    // console.log(data);
-    connect.connectToServer("login", data);
-    // panel.hide();
-});
-
-/* start - injectCode */
-
-var pageMods = require("sdk/page-mod");
-var self = require("sdk/self");
-
-var pageMod = pageMods.PageMod({
-    include: ['*.baidu.com'], // TODO ??
-    contentScriptFile: self.data.url("content-script.js"),
-    contentScriptWhen: "ready",
-    onAttach: startListening
-});
-
-function startListening(worker) {
-    worker.port.on('click', function(data) {
-        connect.connectToServer("click", data);
-    });
-    worker.port.on('detach', function(data) {
-        connect.connectToServer("detach", data);
-    });
-}
-
 /* end - injectCode */
+var window = require("sdk/window/utils").getMostRecentBrowserWindow();
+var initialized = false;
 
 function citexplore() {
     var citeXplore = {
@@ -267,8 +183,6 @@ function showSideBar() {
     }
 }
 
-window.addEventListener("load", citexplore(), true);
-
-var tabs = require("sdk/tabs"); // for test
-// for test
-tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");
+exports.citexplore = citexplore;
+exports.window = window;
+exports.showSideBar = showSideBar;
