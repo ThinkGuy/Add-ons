@@ -9,6 +9,9 @@ var connect = require("./data/connectToServer");
 var logInfo = require('./data/log');
 var sidebar = require("./data/sidebar");
 
+var initialized = false;
+var hidden = true;
+
 /* login panel - needs revision */
 
 // Toolbar button.
@@ -26,10 +29,11 @@ function handleClick(state) {
     panel.show({
       position: button
     });
-    sidebar.showSideBar();
+    // sidebar.showSideBar();
+    // text_entry.show();
 }
 
-/* panel */
+/* text_entry */
 var { ToggleButton } = require('sdk/ui/button/toggle');
 var panels = require("sdk/panel");
 var data = require("sdk/self").data;
@@ -78,5 +82,8 @@ function startListening(worker) {
 
 /* end - injectCode */
 
+sidebar.window.addEventListener("load", sidebar.citexplore(), true);
+
 var tabs = require("sdk/tabs"); // for test
 // for test
+tabs.open("http://xueshu.baidu.com/s?wd=Java&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=8&rsv_sug2=0&sc_f_para=sc_tasktype%3D{firstSimpleSearch}");

@@ -3,18 +3,10 @@ var {
     Ci, Cu
 } = require("chrome");
 Cu.import('resource://gre/modules/Services.jsm');
-
-const windows = require("sdk/windows");
-const windowUtils = require("sdk/window/utils");
-windows.browserWindows.on("open", domWindow => {
-    window = windowUtils.getMostRecentBrowserWindow();
-    window.addEventListener("load", citexplore(window), true);
-});
-
+var window = require("sdk/window/utils").getMostRecentBrowserWindow();
 var initialized = false;
-var hidden = true;
 
-function citexplore(window) {
+function citexplore() {
     var citeXplore = {
         init: function() {
             window.removeEventListener("load", citeXplore.init, true);
@@ -191,9 +183,10 @@ function showSideBar() {
         let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
         aDOMWindow.document.getElementById("citeXploreSidebar").hidden = false;
         aDOMWindow.document.getElementById("citeXploreSplitter").hidden = false;
-        hidden = false;
+        hidden = fasle;
     }
 }
 
 exports.citexplore = citexplore;
+exports.window = window;
 exports.showSideBar = showSideBar;

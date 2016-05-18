@@ -19,6 +19,7 @@ logInfo.log(1, data[2]);
             },
             onComplete: function(response) {
                 var text = response.text;
+                // TODO revise log information with log level
 logInfo.log(1, text);      
             }
         });
