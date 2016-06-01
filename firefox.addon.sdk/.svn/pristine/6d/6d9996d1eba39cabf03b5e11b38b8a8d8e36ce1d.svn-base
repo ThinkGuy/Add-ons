@@ -1,6 +1,3 @@
-var preDocument = "a";
-var preAppcontent;
-
 /* end - injectCode */
 var {
     Ci, Cu
@@ -14,7 +11,8 @@ for (let window of windows.browserWindows) {
     citexplore(viewFor(window));
 }
 windows.browserWindows.on("open", function(window) {
-    citexplore(viewFor(window));
+    var w = viewFor(window);
+    console.log(w);
 });
 
 var initialized = false;
@@ -23,6 +21,8 @@ var hidden = true;
 function citexplore(window) {
     var citeXplore = {
         init: function() {
+            window.removeEventListener("load", citeXplore.init, true);
+
             var appcontent = window.document.getElementById("appcontent");
             if (appcontent) {
                 appcontent.addEventListener("DOMContentLoaded", citeXplore.onPageLoad, false);
@@ -32,12 +32,19 @@ function citexplore(window) {
         onPageLoad: function(aEvent) {
             var urls_reg = "^(https*:\/\/xueshu\.baidu\.com\/.*)";
             var doc = aEvent.originalTarget;
+            console.log(aEvent.currentTarget.ownerDocument.getElementById('citeXploreSplitter'));
             var m = (new RegExp(urls_reg, 'i')).test(doc.location.href);
             if (!m) return;
 
             /*start - createSidebar*/
-            createSideBar(aEvent);
-showSidebar(aEvent);
+            if (initialized) {
+                if (hidden) {
+                    showSideBar();
+                }
+                return;
+            }
+            createSideBar();
+            initialized = true;
             /*end - createSideBar*/
         }
     };
@@ -47,18 +54,27 @@ showSidebar(aEvent);
 
 // Create side bar.
 
-function createSideBar(aEvent) {
+function createSideBar() {
     var windowListener = {
-        loadIntoWindow: function(aEvent) {
-            ownerDocument = aEvent.currentTarget.ownerDocument;
-            if (ownerDocument.getElementById('citeXploreSplitter')) {
+        register: function() {
+            let XULWindows = Services.wm.getXULWindowEnumerator(null);
+            while (XULWindows.hasMoreElements()) {
+                let aXULWindow = XULWindows.getNext();
+                let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
+                windowListener.loadIntoWindow(aDOMWindow, aXULWindow);
+            }
+            Services.wm.addListener(windowListener);
+        },
+
+        loadIntoWindow: function(aDOMWindow, aXULWindow) {
+            if (!aDOMWindow) {
                 return;
             }
- 
-            var browser = ownerDocument.getElementById('browser');
+
+            var browser = aDOMWindow.document.querySelector('#browser')
             if (browser) {
 
-                var splitter = ownerDocument.createElement('splitter');
+                var splitter = aDOMWindow.document.createElement('splitter');
                 var propsToSet = {
                     id: 'citeXploreSplitter',
                     hidden: 'false',
@@ -67,7 +83,7 @@ function createSideBar(aEvent) {
                     splitter.setAttribute(p, propsToSet[p]);
                 }
 
-                var createSideBar = ownerDocument.createElement('vbox');
+                var createSideBar = aDOMWindow.document.createElement('vbox');
                 var propsToSet = {
                     id: 'citeXploreSidebar',
                     hidden: 'false',
@@ -76,7 +92,7 @@ function createSideBar(aEvent) {
                     createSideBar.setAttribute(p, propsToSet[p]);
                 }
 
-                var sidebarBrowser = ownerDocument.createElement('browser');
+                var sidebarBrowser = aDOMWindow.document.createElement('browser');
                 var propsToSet = {
                     id: 'citeXploreBrowser',
                     type: 'content',
@@ -93,7 +109,7 @@ function createSideBar(aEvent) {
                     sidebarBrowser.setAttribute(p, propsToSet[p]);
                 }
 
-                var hbox = ownerDocument.createElement('hbox');
+                var hbox = aDOMWindow.document.createElement('hbox');
                 var propsToSet = {
                     id: 'citeXploreHbox',
                 }
@@ -101,7 +117,7 @@ function createSideBar(aEvent) {
                     hbox.setAttribute(p, propsToSet[p]);
                 }
 
-                var toolbar = ownerDocument.createElement('toolbar');
+                var toolbar = aDOMWindow.document.createElement('toolbar');
                 var propsToSet = {
                     id: 'citeXploreToolbar',
                 }
@@ -109,7 +125,7 @@ function createSideBar(aEvent) {
                     toolbar.setAttribute(p, propsToSet[p]);
                 }
 
-                var toolbarbutton = ownerDocument.createElement('toolbarbutton');
+                var toolbarbutton = aDOMWindow.document.createElement('toolbarbutton');
                 var propsToSet = {
                     id: 'citeXploreToolbarButton',
                     label: 'Hide',
@@ -120,8 +136,9 @@ function createSideBar(aEvent) {
                 }
 
                 toolbarbutton.addEventListener('command', function(event) {
-                    event.currentTarget.ownerDocument.getElementById("citeXploreSidebar").hidden = true;
-                    event.currentTarget.ownerDocument.getElementById("citeXploreSplitter").hidden = true;
+                    aDOMWindow.document.getElementById("citeXploreSidebar").hidden = true;
+                    aDOMWindow.document.getElementById("citeXploreSplitter").hidden = true;
+                    hidden = true;
                 }, false);
 
                 browser.appendChild(splitter);
@@ -135,16 +152,21 @@ function createSideBar(aEvent) {
         }
     };
 
-    windowListener.loadIntoWindow(aEvent);
+    windowListener.register();
 }
 
-function showSidebar(aEvent) {
-    if (aEvent.currentTarget.ownerDocument.getElementById("citeXploreSidebar").hidden ==  true
-        && aEvent.currentTarget.ownerDocument.getElementById("citeXploreSplitter").hidden == true) {
-        aEvent.currentTarget.ownerDocument.getElementById("citeXploreSidebar").hidden = false;
-        aEvent.currentTarget.ownerDocument.getElementById("citeXploreSplitter").hidden = false;
+// Show sidebar.
+
+function showSideBar() {
+    if (initialized && hidden) {
+        let XULWindows = Services.wm.getXULWindowEnumerator(null);
+        let aXULWindow = XULWindows.getNext();
+        let aDOMWindow = aXULWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
+        aDOMWindow.document.getElementById("citeXploreSidebar").hidden = false;
+        aDOMWindow.document.getElementById("citeXploreSplitter").hidden = false;
+        hidden = false;
     }
 }
 
 exports.citexplore = citexplore;
-exports.showSidebar = showSidebar;
+exports.showSideBar = showSideBar;

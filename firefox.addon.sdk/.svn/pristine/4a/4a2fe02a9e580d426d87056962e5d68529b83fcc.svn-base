@@ -49,6 +49,11 @@ showSidebar(aEvent);
 
 function createSideBar(aEvent) {
     var windowListener = {
+        register: function() {
+            windowListener.loadIntoWindow(aEvent);
+            //Services.wm.addListener(windowListener);
+        },
+
         loadIntoWindow: function(aEvent) {
             ownerDocument = aEvent.currentTarget.ownerDocument;
             if (ownerDocument.getElementById('citeXploreSplitter')) {
@@ -135,7 +140,7 @@ function createSideBar(aEvent) {
         }
     };
 
-    windowListener.loadIntoWindow(aEvent);
+    windowListener.register();
 }
 
 function showSidebar(aEvent) {

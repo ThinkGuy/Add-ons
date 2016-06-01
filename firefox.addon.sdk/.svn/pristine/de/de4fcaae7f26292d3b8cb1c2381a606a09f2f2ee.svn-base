@@ -5,6 +5,7 @@
 
 // SDK variables.
 var actionButton = require('sdk/ui/button/action');
+
 // System variables.
 var connect = require("./data/sendToServer");
 var logger = require('./data/logger');
@@ -27,9 +28,7 @@ function handleClick(state) {
     panel.show({
       position: button
     });
-    
-    //不知道怎么传Event.
-    //sidebar.showSideBar(aEvent);
+    sidebar.showSideBar();
 }
 
 /* panel */
